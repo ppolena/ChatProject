@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -74,8 +74,8 @@ public class SocketHandler extends TextWebSocketHandler {
                             new TextMessage(new Gson().toJson(new Error(Response.AuthorizationFailed))));
                 }
             }
-            catch(HTTPException e){
-                /*if(e.getStatusCode() == 500) {
+            catch(HttpServerErrorException e){
+                /*if(e.getRawStatusCode() == 500) {
 
                 }*/
                 session.sendMessage(

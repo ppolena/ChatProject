@@ -4,10 +4,8 @@ import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.socket.TextMessage;
-
-import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -80,8 +78,8 @@ public class ChannelController {
                 }
             }
         }
-        catch(HTTPException e){
-            /*if(e.getStatusCode() == 500) {
+        catch(HttpServerErrorException e){
+            /*if(e.getRawStatusCode() == 500) {
 
             }*/
             return new Error(Response.AuthorizationFailed);
