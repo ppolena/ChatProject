@@ -33,21 +33,13 @@ public class ChannelService {
                                    String accountId,
                                    String data) throws IOException{
         if(cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN)){
-
-            if(!(boolean)session.getAttributes().get("can_write")){
-                session.sendMessage(
-                        new TextMessage(new Gson()
-                                .toJson(new Error(Response.NotAuthorized))));
-            }
-            else {
-                ObjectMapper objectMapper = new ObjectMapper();
-                Message message = new Message(accountId, data, cr.findByName(channelName));
-                cr.findByName(channelName).addMessage(message);
-                mr.save(message);
-                for (WebSocketSession webSocketSession : sessions.get(channelName)) {
-                    webSocketSession.sendMessage(
-                            new TextMessage(objectMapper.writeValueAsString(message)));
-                }
+            ObjectMapper objectMapper = new ObjectMapper();
+            Message message = new Message(accountId, data, cr.findByName(channelName));
+            cr.findByName(channelName).addMessage(message);
+            mr.save(message);
+            for (WebSocketSession webSocketSession : sessions.get(channelName)) {
+                webSocketSession.sendMessage(
+                        new TextMessage(objectMapper.writeValueAsString(message)));
             }
         }
         else {
@@ -61,12 +53,6 @@ public class ChannelService {
                                        String accountId,
                                        String data) throws IOException{
         if((sessions.get(channelName) != null) && (cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN))){
-            for(WebSocketSession s : sessions.get(channelName)){
-                if(s.getAttributes().get("account_id").equals(accountId) &&
-                        !(boolean)s.getAttributes().get("can_write")){
-                    return new Error(Response.NotAuthorized);
-                }
-            }
             ObjectMapper objectMapper = new ObjectMapper();
             Message message = new Message(accountId, data, cr.findByName(channelName));
             cr.findByName(channelName).addMessage(message);
@@ -89,13 +75,13 @@ public class ChannelService {
     }
 
     public void addSession(WebSocketSession session){
-        if(sessions.containsKey(session.getAttributes().get("channel_name"))){
-            sessions.get(session.getAttributes().get("channel_name")).add(session);
+        if(sessions.containsKey(session.getAttributes().get("channelName"))){
+            sessions.get(session.getAttributes().get("channelName")).add(session);
         }
         else{
             List<WebSocketSession> sessionList = new ArrayList<>();
             sessionList.add(session);
-            sessions.put((String) session.getAttributes().get("channel_name"), sessionList);
+            sessions.put((String) session.getAttributes().get("channelName"), sessionList);
         }
     }
 

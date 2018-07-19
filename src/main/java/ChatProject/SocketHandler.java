@@ -27,7 +27,7 @@ public class SocketHandler extends TextWebSocketHandler {
 
         Map<String, String> messageJson = new Gson().fromJson(message.getPayload(), Map.class);
 
-        String channelName = (String) session.getAttributes().get("channel_name");
+        String channelName = (String) session.getAttributes().get("channelName");
 
         if(messageJson.get("type").equals("authorization") && !(boolean)session.getAttributes().get("authenticated")){
             String token = messageJson.get("authorization") == null ? "" : messageJson.get("authorization");
@@ -54,17 +54,17 @@ public class SocketHandler extends TextWebSocketHandler {
                         for (Message m : channelController
                                 .listOfMessages((String) session
                                         .getAttributes()
-                                        .get("channel_name"), 60L)) {
+                                        .get("channelName"), 60L)) {
                             session.sendMessage(new TextMessage(
                                     objectMapper.writeValueAsString(m)));
                         }
                         session.getAttributes().put("authenticated", true);
-                        session.getAttributes().put("can_read", (boolean)responseJson.get("canRead"));
-                        session.getAttributes().put("can_write", (boolean)responseJson.get("canWrite"));
+                        session.getAttributes().put("canRead", (boolean)responseJson.get("canRead"));
+                        session.getAttributes().put("canWrite", (boolean)responseJson.get("canWrite"));
                         if(responseJson.get("profilePictureId") != null) {
-                            session.getAttributes().put("profile_picture_id", responseJson.get("profilePictureId"));
+                            session.getAttributes().put("profilePictureId", responseJson.get("profilePictureId"));
                         }
-                        session.getAttributes().put("account_id", accountId);
+                        session.getAttributes().put("accountId", accountId);
                         session.sendMessage(
                                 new TextMessage(new Gson().toJson(new Success(Response.AuthorizationSuccess))));
                     }
@@ -84,11 +84,16 @@ public class SocketHandler extends TextWebSocketHandler {
         }
         else {
             if((boolean)session.getAttributes().get("authenticated") &&
-                    (boolean)session.getAttributes().get("can_write")) {
+                    (boolean)session.getAttributes().get("canWrite")) {
                 channelService.saveAndSendMessage(session,
                         channelName,
-                        (String) session.getAttributes().get("account_id"),
+                        (String) session.getAttributes().get("accountId"),
                         messageJson.get("data"));
+            }
+            else{
+                session.sendMessage(
+                        new TextMessage(new Gson()
+                                .toJson(new Error(Response.NotAuthorized))));
             }
         }
     }
@@ -98,4 +103,4 @@ public class SocketHandler extends TextWebSocketHandler {
         channelService.addSession(session);
     }
 }
-//{"type":"authorization", "accountId":"58c57183-109d-4ffd-9634-ebd4bf0b31e1", "authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdE5hbWUiOiJQZXRlciIsImxhc3ROYW1lIjoiUG9sZW5hIiwiYXVkIjpbIm9hdXRoMl9pZCJdLCJ1c2VyX25hbWUiOiJwZXRlci5wb2xlbmFAbW9vbjQyLmNvbSIsImRpc3BsYXlOYW1lIjoiUGV0aSIsInByb2ZpbGVQaWN0dXJlSWQiOm51bGwsInNjb3BlIjpbInJlYWQiLCJ3cml0ZSJdLCJhY2NvdW50VHlwZSI6IlBSSVZBVEUiLCJleHAiOjE1MzE5NTE4MDksInVzZXJJZCI6IjU4YzU3MTgzLTEwOWQtNGZmZC05NjM0LWViZDRiZjBiMzFlMSIsImp0aSI6IjM5NmE4MzE3LTQ3MzctNGYzMS04OGI0LTFlMjEzMzlkZTEwOSIsImNsaWVudF9pZCI6Im9uYWlyLXVpIn0.KfcK9SplNK-u4a4gfJmZNrv_W3pU8tko_5ftYXJ1wgk"}
+//{"type":"authorization", "accountId":"58c57183-109d-4ffd-9634-ebd4bf0b31e1", "authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdE5hbWUiOiJQZXRlciIsImxhc3ROYW1lIjoiUG9sZW5hIiwiYXVkIjpbIm9hdXRoMl9pZCJdLCJ1c2VyX25hbWUiOiJwZXRlci5wb2xlbmFAbW9vbjQyLmNvbSIsImRpc3BsYXlOYW1lIjoiUGV0aSIsInByb2ZpbGVQaWN0dXJlSWQiOm51bGwsInNjb3BlIjpbInJlYWQiLCJ3cml0ZSJdLCJhY2NvdW50VHlwZSI6IlBSSVZBVEUiLCJleHAiOjE1MzIwMzEyNTIsInVzZXJJZCI6IjU4YzU3MTgzLTEwOWQtNGZmZC05NjM0LWViZDRiZjBiMzFlMSIsImp0aSI6IjVhZDFjOTQ0LTIyMDgtNDg2YS1hN2YxLTAwN2U3YzIyY2EwYiIsImNsaWVudF9pZCI6Im9uYWlyLXVpIn0.TXRA77U25CsqC581IK2k7nThAtXXd3dIRegTG2k8R2E"}
