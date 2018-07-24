@@ -32,7 +32,7 @@ public class ChannelService {
                                    String channelName,
                                    String accountId,
                                    String data) throws IOException{
-        if(cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN)){
+        if(cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE)){
             ObjectMapper objectMapper = new ObjectMapper();
             Message message = new Message(accountId, data, cr.findByName(channelName));
             cr.findByName(channelName).addMessage(message);
@@ -52,7 +52,8 @@ public class ChannelService {
     public Response saveAndSendMessage(String channelName,
                                        String accountId,
                                        String data) throws IOException{
-        if((sessions.get(channelName) != null) && (cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN))){
+        if((sessions.get(channelName) != null) &&
+                (cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
             ObjectMapper objectMapper = new ObjectMapper();
             Message message = new Message(accountId, data, cr.findByName(channelName));
             cr.findByName(channelName).addMessage(message);
@@ -63,10 +64,12 @@ public class ChannelService {
             }
             return message;
         }
-        else if((sessions.get(channelName) == null) && (cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN))){
+        else if((sessions.get(channelName) == null) &&
+                (cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
             return new Error(Response.NoSession);
         }
-        else if((sessions.get(channelName) == null) && !(cr.findByName(channelName).getStatus().equals(Channel.Status.OPEN))){
+        else if((sessions.get(channelName) == null) &&
+                !(cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
             return new Error(Response.NoSessionChannelStatus + cr.findByName(channelName).getStatus());
         }
         else {

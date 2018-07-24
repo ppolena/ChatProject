@@ -33,7 +33,7 @@ public class Channel {
     private List<Message> listOfMessages;
 
     public enum Status{
-        DRAFT, OPEN, CLOSED
+        DRAFT, ACTIVE, CLOSED
     }
 
     public Channel(){}

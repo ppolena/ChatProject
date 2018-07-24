@@ -24,9 +24,8 @@ public class ChannelController {
     public Response createChannel(  @RequestParam(value="name") String name,
                                     @RequestParam(value="status") Channel.Status status){
         if(channelRepository.findByName(name) == null){
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime dateOfCreation = LocalDateTime.now();
-            channelRepository.save(new Channel(name, status, dtf.format(dateOfCreation)));
+            channelRepository.save(new Channel(name, status, DateTimeFormatter.ISO_DATE.format(dateOfCreation)));
             return new Success(Response.ChannelCreationSuccess);
         }
         return new Error(Response.ChannelCreationFailed);
@@ -47,9 +46,10 @@ public class ChannelController {
                                         @RequestParam(value="history", defaultValue = "0") Long history){
         if(history != 0){
             List<Message> result = new ArrayList<>();
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             for(Message m : channelRepository.findByName(channelName).getListOfMessages()){
-                if(LocalDateTime.parse(m.getDateOfCreation(), dtf).isAfter(LocalDateTime.now().minusMinutes(history))){
+                if(LocalDateTime.parse(m.getDateOfCreation(), DateTimeFormatter.ISO_DATE)
+                        .isAfter(LocalDateTime.parse(DateTimeFormatter.ISO_DATE.format(LocalDateTime.now()
+                                .minusMinutes(history))))){
                     result.add(m);
                 }
             }
@@ -64,7 +64,10 @@ public class ChannelController {
                                @RequestParam(value="account-id") String accountId,
                                @RequestParam(value="data") String data) throws IOException {
 
-        String url = "https://dev.onair-backend.moon42.com/api/business-layer/v1/chat/account/" + accountId + "/channel/" + channelName;
+        String url = "https://dev.onair-backend.moon42.com/api/business-layer/v1/chat/account/"
+                                                                                        + accountId +
+                                                                                        "/channel/" +
+                                                                                        channelName;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("authorization", authorization);
@@ -92,8 +95,9 @@ public class ChannelController {
                                         @RequestParam(value="status") Channel.Status status){
         channelRepository.findByName(channelName).setStatus(status);
         if(status.equals(Channel.Status.CLOSED)){
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-            channelRepository.findByName(channelName).setDateOfClosing(dtf.format(LocalDateTime.now()));
+            channelRepository.findByName(channelName).setDateOfClosing(DateTimeFormatter
+                                                                            .ISO_DATE
+                                                                                .format(LocalDateTime.now()));
         }
         channelRepository.flush();
         return new Success(Response.ChannelStatusChanged);
