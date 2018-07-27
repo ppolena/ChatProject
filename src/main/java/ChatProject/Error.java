@@ -2,6 +2,7 @@ package ChatProject;
 
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -16,8 +17,7 @@ public class Error implements Response{
     public Error(String data){
         this.errorId = UUID.randomUUID().toString();
         this.type = Response.Type.ERROR;
-        DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
-        this.dateOfCreation =  dtf.format(LocalDateTime.now());
+        this.dateOfCreation = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
         this.data = data;
     }
 }

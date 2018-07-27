@@ -98,5 +98,4 @@ public class ChannelService {
             sessions.put((String) session.getAttributes().get("channelName"), sessionList);
         }
     }
-
 }

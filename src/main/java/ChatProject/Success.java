@@ -1,6 +1,8 @@
 package ChatProject;
 
 import lombok.Data;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -15,8 +17,7 @@ public class Success implements Response{
     public Success(String data){
         this.successId = UUID.randomUUID().toString();
         this.type = Response.Type.SUCCESS;
-        DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
-        this.dateOfCreation =  dtf.format(LocalDateTime.now());
+        this.dateOfCreation =  DateTimeFormatter.ISO_INSTANT.format(Instant.now());
         this.data = data;
     }
 }

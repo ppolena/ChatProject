@@ -12,8 +12,13 @@ public interface Response{
     String AuthorizationSuccess = "AUTHORIZATION_SUCCESS";
     String AuthorizationFailed = "AUTHORIZATION_FAILED";
     String NotAuthorized = "NOT_AUTHORIZED";
-    String BadNameField = "BAD_NAME_FIELD";
-    String BadStatusField = "BAD_STATUS_FIELD";
+    String EmptyName = "EMPTY_NAME";
+    String EmptyStatus = "EMPTY_STATUS";
+    String NoSuchStatus = "NO_SUCH_STATUS";
+    String InvalidChannelIdEdit = "INVALID_CHANNEL_ID_EDIT";
+    String InvalidNameEdit = "INVALID_NAME_EDIT";
+    String InvalidDateOfCreationEdit = "INVALID_DATE_OF_CREATION_EDIT";
+    String InvalidDateOfClosingEdit = "INVALID_DATE_OF_CLOSING_EDIT";
 
     enum Type{
         MESSAGE, ERROR, SUCCESS

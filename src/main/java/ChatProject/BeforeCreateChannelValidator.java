@@ -8,7 +8,7 @@ import org.springframework.validation.Validator;
 
 @RequiredArgsConstructor
 @Component("beforeCreateChannelValidator")
-public class PostChannelValidator implements Validator {
+public class BeforeCreateChannelValidator implements Validator {
 
     private final ChannelRepository channelRepository;
 
@@ -20,8 +20,8 @@ public class PostChannelValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         Channel channel = (Channel) target;
-        ValidationUtils.rejectIfEmpty(errors, "name", "name.empty", Response.BadNameField);
-        ValidationUtils.rejectIfEmpty(errors, "status", "status.empty", Response.BadStatusField);
+        ValidationUtils.rejectIfEmpty(errors, "name", "name.empty", Response.EmptyName);
+        ValidationUtils.rejectIfEmpty(errors, "status", "status.empty", Response.EmptyStatus);
         if(channelRepository.findByName(channel.getName()) != null){
             errors.rejectValue("name", "name.exists", Response.ChannelAlreadyExists);
         }

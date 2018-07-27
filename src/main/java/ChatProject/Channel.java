@@ -20,12 +20,14 @@ public class Channel {
     private String channelId;
 
     @NotNull
+    @Column(updatable=false)
     private String name;
 
     @NotNull
     private Status status;
 
     @NotNull
+    @Column(updatable=false)
     private String dateOfCreation = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
     private String dateOfClosing;

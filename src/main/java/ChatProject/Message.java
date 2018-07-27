@@ -23,14 +23,17 @@ public class Message implements Response{
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String messageId;
 
+    @Column(updatable=false)
     private Type type;
 
     @NotNull
+    @Column(updatable=false)
     private String dateOfCreation;
 
     private String data;
 
     @NotNull
+    @Column(updatable=false)
     private String accountId;
 
     @JsonIgnore
