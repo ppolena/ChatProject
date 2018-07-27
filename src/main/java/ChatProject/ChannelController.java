@@ -2,72 +2,35 @@ package ChatProject;
 
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
+@RepositoryRestController
 @RequiredArgsConstructor
-@RestController
 public class ChannelController {
 
     private final ChannelRepository channelRepository;
     private final ChannelService channelService;
 
-    @PostMapping("/channel")
-    public Response createChannel(  @RequestParam(value="name") String name,
-                                    @RequestParam(value="status") Channel.Status status){
-        if(channelRepository.findByName(name) == null){
-            LocalDateTime dateOfCreation = LocalDateTime.now();
-            channelRepository.save(new Channel(name, status, DateTimeFormatter.ISO_DATE.format(dateOfCreation)));
-            return new Success(Response.ChannelCreationSuccess);
-        }
-        return new Error(Response.ChannelCreationFailed);
-    }
-
-    @GetMapping("/channel")
-    public List<Channel> listOfChannels(){
-        return channelRepository.findAll();
-    }
-
-    @GetMapping("/channel/findbyname/{channel-name}")
-    public Channel findChannelByName(@PathVariable(value="channel-name") String channelName){
-        return channelRepository.findByName(channelName);
-    }
-
-    @GetMapping("/channel/findbyname/{channel-name}/messages")
-    public List<Message> listOfMessages(@PathVariable(value="channel-name") String channelName,
-                                        @RequestParam(value="history", defaultValue = "0") Long history){
-        if(history != 0){
-            List<Message> result = new ArrayList<>();
-            for(Message m : channelRepository.findByName(channelName).getListOfMessages()){
-                if(LocalDateTime.parse(m.getDateOfCreation(), DateTimeFormatter.ISO_DATE)
-                        .isAfter(LocalDateTime.parse(DateTimeFormatter.ISO_DATE.format(LocalDateTime.now()
-                                .minusMinutes(history))))){
-                    result.add(m);
-                }
-            }
-            return result;
-        }
-        return channelRepository.findByName(channelName).getListOfMessages();
-    }
-
-    @PostMapping("/channel/{channel-name}/message")
-    public Response addMessage(@PathVariable(value="channel-name") String channelName,
+    @PostMapping("/channel/{channelName}/message")
+    public ResponseEntity addMessage(@PathVariable(value="channelName") String channelName,
                                @RequestParam(value="authorization") String authorization,
-                               @RequestParam(value="account-id") String accountId,
+                               @RequestParam(value="accountId") String accountId,
                                @RequestParam(value="data") String data) throws IOException {
-
-        String url = "https://dev.onair-backend.moon42.com/api/business-layer/v1/chat/account/"
-                                                                                        + accountId +
-                                                                                        "/channel/" +
-                                                                                        channelName;
+        Resource<Response> resource;
+        String url = "https://dev.onair-backend.moon42.com/api/business-layer/v1/chat/account/" + accountId + "/channel/" + channelName;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("authorization", authorization);
@@ -77,7 +40,9 @@ public class ChannelController {
             if(((ResponseEntity<String>) response).getStatusCode() == HttpStatus.OK) {
                 Map<String, Object> responseJson = new Gson().fromJson(response.getBody(), Map.class);
                 if(!(boolean)responseJson.get("canWrite")){
-                    return new Error(Response.AuthorizationFailed);
+                    return new ResponseEntity<>(new Error(Response.NotAuthorized),
+                                                new HttpHeaders(),
+                                                HttpStatus.UNAUTHORIZED);
                 }
             }
         }
@@ -85,14 +50,21 @@ public class ChannelController {
             /*if(e.getRawStatusCode() == 500) {
 
             }*/
-            return new Error(Response.AuthorizationFailed);
+            return new ResponseEntity<>(new Error(Response.NotAuthorized), new HttpHeaders(),
+                    HttpStatus.UNAUTHORIZED);
         }
         return channelService.saveAndSendMessage(channelName, accountId, data);
     }
 
-    @PatchMapping("/channel/findbyname/{channel-name}")
-    public Response updateChannelStatus(@PathVariable(value="channel-name") String channelName,
+    @PatchMapping("/channel/findByName/{channelName}")
+    public ResponseEntity updateChannelStatus(@PathVariable(value="channelName") String channelName,
                                         @RequestParam(value="status") Channel.Status status){
+        if(channelRepository.findByName(channelName) == null){
+            return ResponseEntity.notFound().build();
+        }
+        if(channelRepository.findByName(channelName).getStatus().equals(Channel.Status.CLOSED)){
+            return ResponseEntity.status(409).build();
+        }
         channelRepository.findByName(channelName).setStatus(status);
         if(status.equals(Channel.Status.CLOSED)){
             channelRepository.findByName(channelName).setDateOfClosing(DateTimeFormatter
@@ -100,6 +72,7 @@ public class ChannelController {
                                                                                 .format(LocalDateTime.now()));
         }
         channelRepository.flush();
-        return new Success(Response.ChannelStatusChanged);
+        Resource<Channel> resource = new Resource<>(channelRepository.findByName(channelName));
+        return ResponseEntity.ok(resource);
     }
 }

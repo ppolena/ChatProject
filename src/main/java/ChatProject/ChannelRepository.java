@@ -1,7 +1,14 @@
 package ChatProject;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
+import java.util.List;
+
+@RepositoryRestResource(collectionResourceRel = "channel", path = "channel")
 public interface ChannelRepository extends JpaRepository<Channel, String> {
-    Channel findByName(String name);
+    @RestResource(path = "findByName")
+    Channel findByName(@Param("name") String name);
 }

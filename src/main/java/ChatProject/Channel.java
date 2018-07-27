@@ -4,7 +4,8 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.LinkedList;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -25,7 +26,7 @@ public class Channel {
     private Status status;
 
     @NotNull
-    private String dateOfCreation;
+    private String dateOfCreation = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
     private String dateOfClosing;
 
@@ -34,18 +35,5 @@ public class Channel {
 
     public enum Status{
         DRAFT, ACTIVE, CLOSED
-    }
-
-    public Channel(){}
-
-    public Channel(String name, Status status, String dateOfCreation){
-        this.name = name;
-        this.status = status;
-        this.dateOfCreation = dateOfCreation;
-        this.listOfMessages = new LinkedList<>();
-    }
-
-    public void addMessage(Message message){
-        listOfMessages.add(message);
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
@@ -12,6 +13,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Map;
 
 @Component
@@ -19,7 +21,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SocketHandler extends TextWebSocketHandler {
 
-    private final ChannelController channelController;
+    private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
     private final ChannelService channelService;
 
     @Override
@@ -51,10 +54,13 @@ public class SocketHandler extends TextWebSocketHandler {
                     }
                     else {
                         ObjectMapper objectMapper = new ObjectMapper();
-                        for (Message m : channelController
-                                .listOfMessages((String) session
-                                        .getAttributes()
-                                        .get("channelName"), 60L)) {
+                        Resources<Message> resources =
+                                new Resources<>(messageRepository.findByParentAndDateOfCreationGreaterThan(
+                                                    channelRepository
+                                                            .findByName(channelName), (Instant.now()
+                                                                                        .minusSeconds(30*60))
+                                                                                            .toString()));
+                        for (Object m : resources.getContent()) {
                             session.sendMessage(new TextMessage(
                                     objectMapper.writeValueAsString(m)));
                         }

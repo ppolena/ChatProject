@@ -27,6 +27,7 @@ repositories {
 dependencies {
 	compile("org.springframework.boot:spring-boot-starter-websocket")
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-data-rest')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 	compile	group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
@@ -38,5 +39,6 @@ dependencies {
 	compile("org.webjars:webjars-locator-core")
 	compile("org.webjars:bootstrap:3.3.7")
 	compile("org.webjars:jquery:3.1.0")
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.24.0.RELEASE'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }

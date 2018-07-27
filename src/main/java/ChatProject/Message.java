@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -45,7 +46,7 @@ public class Message implements Response{
     public Message(String accountId, String data, Channel parent){
         this.accountId = accountId;
         this.type = Response.Type.MESSAGE;
-        this.dateOfCreation = DateTimeFormatter.ISO_DATE.format(LocalDateTime.now());
+        this.dateOfCreation = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
         this.data = data;
         this.parent = parent;
     }
