@@ -15,6 +15,7 @@ public class Channel {
 
     @Id
     @NotNull
+    @Column(updatable=false)
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private String channelId;

@@ -20,6 +20,9 @@ public class BeforeCreateChannelValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         Channel channel = (Channel) target;
+
+        System.out.println(channel.getChannelId());
+
         ValidationUtils.rejectIfEmpty(errors, "name", "name.empty", Response.EmptyName);
         ValidationUtils.rejectIfEmpty(errors, "status", "status.empty", Response.EmptyStatus);
         if(channelRepository.findByName(channel.getName()) != null){

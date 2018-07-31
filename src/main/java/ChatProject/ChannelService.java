@@ -2,7 +2,7 @@ package ChatProject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,19 +16,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Service("ChannelService")
 public class ChannelService {
 
-    @Autowired
-    private ChannelRepository cr;
-    @Autowired
-    private MessageRepository mr;
+    private final ChannelRepository cr;
+    private final MessageRepository mr;
+
+    private Map<String, List<WebSocketSession>> sessions = new HashMap<>();
 
     public Map<String, List<WebSocketSession>> getSessions() {
         return sessions;
     }
-
-    private Map<String, List<WebSocketSession>> sessions = new HashMap<>();
 
     public void saveAndSendMessage(WebSocketSession session,
                                    String channelName,
@@ -46,25 +45,33 @@ public class ChannelService {
         else {
             session.sendMessage(
                     new TextMessage(new Gson()
-                            .toJson(new Error(Response.ChannelStatus +cr.findByName(channelName).getStatus()))));
+                            .toJson(new Error(Response.ChannelStatus + cr.findByName(channelName).getStatus()))));
         }
     }
 
     public ResponseEntity saveAndSendMessage(String channelName,
                                              String accountId,
-                                             String data) throws IOException{
-        Resource<Response> resource;
+                                             String data){
         if((sessions.get(channelName) != null) &&
                 (cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
-            ObjectMapper objectMapper = new ObjectMapper();
             Message message = new Message(accountId, data, cr.findByName(channelName));
-            mr.save(message);
-            for (WebSocketSession webSocketSession : sessions.get(channelName)) {
-                webSocketSession.sendMessage(
-                        new TextMessage(objectMapper.writeValueAsString(message)));
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                for (WebSocketSession webSocketSession : sessions.get(channelName)) {
+                    webSocketSession.sendMessage(
+                            new TextMessage(objectMapper.writeValueAsString(message)));
+                }
+                return new ResponseEntity<>(
+                        new Success(Response.MessageCreationSuccessful),
+                        new HttpHeaders(),
+                        HttpStatus.CREATED);
             }
-            resource = new Resource<>(message);
-            return ResponseEntity.ok(resource);
+            catch(IOException e){
+                return new ResponseEntity<>(
+                        new Error("OBJECT_MAPPER_IO_EXCEPTION"),
+                        new HttpHeaders(),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
         else if((sessions.get(channelName) == null) &&
                 (cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE))){

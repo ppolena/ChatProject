@@ -18,11 +18,12 @@ import java.util.Map;
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final ChannelRepository cr;
-    private final MessageRepository ms;
+    private final MessageRepository mr;
     private final ChannelService cs;
+    private final AuthorizationService as;
 
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new SocketHandler(cr, ms, cs), "/chat/*")
+        registry.addHandler(new SocketHandler(cr, mr, cs, as), "/chat/*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor(){
 
                     @Override

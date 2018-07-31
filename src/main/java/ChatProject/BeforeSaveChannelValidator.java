@@ -1,53 +1,61 @@
 package ChatProject;
 
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component("beforeSaveChannelValidator")
 public class BeforeSaveChannelValidator implements Validator {
 
     private final ChannelRepository channelRepository;
-    private final ValidatorService validatorService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public boolean supports(Class<?> clazz) {
         return Channel.class.equals(clazz);
     }
 
+
     @Override
     public void validate(Object target, Errors errors) {
-        Channel channel = (Channel) target;
+        entityManager.detach(target);
+        Channel newChannel = (Channel) target;
+        Channel oldChannel = channelRepository.findById(newChannel.getChannelId()).get();
+
         ValidationUtils.rejectIfEmpty(errors, "name", "name.empty", Response.EmptyName);
         ValidationUtils.rejectIfEmpty(errors, "status", "status.empty", Response.EmptyStatus);
-        if(!validatorService.checkInvalidChannelIdEdit(channel)){
-            errors.rejectValue("channelId", "channelId.invalidEdit", Response.InvalidChannelIdEdit);
+
+        if(!oldChannel.getName().equals(newChannel.getName())){
+            errors.rejectValue("name", "name.editNotAllowed", Response.NameEditNotAllowed);
         }
-        else {
-            if (!validatorService.checkInvalidNameEdit(channel.getChannelId(), channel.getName())) {
-                errors.rejectValue("name", "name.invalidEdit", Response.InvalidNameEdit);
-            }
-            if (!validatorService.checkInvalidDateOfCreationEdit(channel.getChannelId(), channel.getDateOfCreation())) {
-                errors.rejectValue("dateOfCreation", "dateOfCreation.invalidEdit", Response.InvalidDateOfCreationEdit);
-            }
-            if (!validatorService.checkInvalidDateOfClosingEdit(channel.getChannelId(), channel.getDateOfClosing())) {
-                errors.rejectValue("dateOfClosing", "dateOfClosing.invalidEdit", Response.InvalidDateOfClosingEdit);
-            }
-            if (validatorService.getChannelStatusClosed(channel.getChannelId())) {
-                errors.rejectValue("status", "status.closed", Response.ChannelStatus + Channel.Status.CLOSED);
-            }
-            else if (channel.getStatus().equals(Channel.Status.CLOSED)) {
-                channelRepository.findById(channel.getChannelId()).get().setDateOfClosing(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
-            }
+        if(!oldChannel.getDateOfCreation().equals(newChannel.getDateOfCreation())){
+            errors.rejectValue("dateOfCreation", "dateOfCreation.editNotAllowed", Response.DateOfCreationEditNotAllowed);
         }
+        if(oldChannel.getDateOfClosing() == null && newChannel.getDateOfClosing() != null){
+            errors.rejectValue("dateOfClosing", "dateOfClosing.editNotAllowed", Response.DateOfClosingEditNotAllowed);
+        }
+        if(oldChannel.getStatus().equals(Channel.Status.CLOSED)){
+            errors.rejectValue("status", "status.closed", Response.ChannelStatus + Channel.Status.CLOSED);
+        }
+        else if(newChannel.getStatus().equals(Channel.Status.CLOSED)){
+            newChannel.setDateOfClosing(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+        }
+
+        /*System.out.println("NEW: " + newChannel.getChannelId() + " OLD: " + oldChannel.getChannelId());
+        System.out.println("NEW: " + newChannel.getName() + " OLD: " + oldChannel.getName());
+        System.out.println("NEW: " + newChannel.getStatus() + " OLD: " + oldChannel.getStatus());
+        System.out.println("NEW: " + newChannel.getDateOfCreation() + " OLD: " + oldChannel.getDateOfCreation());
+        System.out.println("NEW: " + newChannel.getDateOfClosing() + " OLD: " + oldChannel.getDateOfClosing());*/
     }
 }

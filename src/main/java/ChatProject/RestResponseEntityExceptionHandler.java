@@ -19,46 +19,7 @@ public class RestResponseEntityExceptionHandler extends
             Exception ex, WebRequest request) {
         RepositoryConstraintViolationException exception =
                 (RepositoryConstraintViolationException) ex;
-        if(exception.getErrors().getFieldError().getDefaultMessage().equals(Response.EmptyName)){
-            return new ResponseEntity<>(
-                    new Error(  exception.getErrors().getFieldError().getDefaultMessage()),
-                                new HttpHeaders(),
-                                HttpStatus.BAD_REQUEST);
-        }
-        if(exception.getErrors().getFieldError().getDefaultMessage().equals(Response.EmptyStatus)){
-            return new ResponseEntity<>(
-                    new Error(  exception.getErrors().getFieldError().getDefaultMessage()),
-                                new HttpHeaders(),
-                                HttpStatus.BAD_REQUEST);
-        }
-        if(exception.getErrors().getFieldError().getDefaultMessage().equals(Response.InvalidChannelIdEdit)){
-            return new ResponseEntity<>(
-                    new Error(  exception.getErrors().getFieldError().getDefaultMessage()),
-                    new HttpHeaders(),
-                    HttpStatus.UNAUTHORIZED);
-        }
-        if(exception.getErrors().getFieldError().getDefaultMessage().equals(Response.InvalidNameEdit)){
-            return new ResponseEntity<>(
-                    new Error(  exception.getErrors().getFieldError().getDefaultMessage()),
-                    new HttpHeaders(),
-                    HttpStatus.UNAUTHORIZED);
-        }
-        if(exception.getErrors().getFieldError().getDefaultMessage().equals(Response.InvalidDateOfCreationEdit)){
-            return new ResponseEntity<>(
-                    new Error(  exception.getErrors().getFieldError().getDefaultMessage()),
-                    new HttpHeaders(),
-                    HttpStatus.UNAUTHORIZED);
-        }
-        if(exception.getErrors().getFieldError().getDefaultMessage().equals(Response.InvalidDateOfClosingEdit)){
-            return new ResponseEntity<>(
-                    new Error(  exception.getErrors().getFieldError().getDefaultMessage()),
-                    new HttpHeaders(),
-                    HttpStatus.UNAUTHORIZED);
-        }
-        return new ResponseEntity<>(
-                new Error(  exception.getErrors().getFieldError().getDefaultMessage()),
-                            new HttpHeaders(),
-                            HttpStatus.CONFLICT);
+        return new ResponseEntity<>( exception.getErrors().getFieldErrors(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
