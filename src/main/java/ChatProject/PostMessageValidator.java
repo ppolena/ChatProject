@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Component("beforeCreateMessageValidator")
-public class BeforeCreateMessageValidator implements Validator{
+public class PostMessageValidator implements Validator{
 
     private final ChannelRepository channelRepository;
     private final ChannelService channelService;
@@ -33,12 +33,12 @@ public class BeforeCreateMessageValidator implements Validator{
         ValidationUtils.rejectIfEmpty(errors, "accountId", "accountId.empty", Response.EmptyAccountId);
         ValidationUtils.rejectIfEmpty(errors, "data", "data.empty", Response.EmptyData);
 
-        if(message.getChannelName() == null || channelRepository.findByName(message.getChannelName()) == null){
-            errors.rejectValue("parent", "parent.notFound", Response.ChannelNotFound);
+        if(message.getChannelName() == null || channelRepository.findByChannelName(message.getChannelName()) == null){
+            errors.rejectValue("channelName", "channelName.notFound", Response.ChannelNotFound);
         }
         else {
-            message.setParent(channelRepository.findByName(message.getChannelName()));
-            ResponseEntity response = authorizationService.authenticate(message.getAccountId(), message.getParent().getName(), message.getAuthorization());
+            message.setParent(channelRepository.findByChannelName(message.getChannelName()));
+            ResponseEntity response = authorizationService.authenticate(message.getAccountId(), message.getParent().getChannelName(), message.getAuthorization());
             if (response.getStatusCode() == HttpStatus.OK) {
                 String body = ((HttpEntity<String>)(response.getBody())).getBody();
                 Map<String, Object> responseJson = new Gson().fromJson(body, Map.class);
@@ -46,7 +46,7 @@ public class BeforeCreateMessageValidator implements Validator{
                     errors.rejectValue("accountId", "accountId.cannotWrite", Response.NotAuthorizedToWrite);
                 }
                 else{
-                    response = channelService.saveAndSendMessage(message.getParent().getName(), message.getAccountId(), message.getData());
+                    response = channelService.saveAndSendMessage(message.getParent().getChannelName(), message.getAccountId(), message.getData());
                     if(response.getStatusCode() != HttpStatus.CREATED){
                         errors.rejectValue("accountId", "accountId.authorizationFailed", ((Error)response.getBody()).getData());
                     }

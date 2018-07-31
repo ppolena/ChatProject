@@ -25,5 +25,5 @@ databaseChangeLog:
               constraints:
                 nullable: false
           constraints:
-            foreignKeyName: fk_parent_id
-            references: channel(channel_id)
+            foreignKeyName: fk_parent_name
+            references: channel(channel_name)

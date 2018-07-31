@@ -23,8 +23,7 @@ public class Message implements Response{
     private String messageId;
 
     @Transient
-    //@Column(updatable=false)
-    private Type type = Response.Type.MESSAGE;
+    private Type type;
 
     @Transient
     private String authorization;
@@ -44,7 +43,7 @@ public class Message implements Response{
 
     @NotNull
     @JsonIgnore
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "channel_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "channel_name")
     @JsonIdentityReference(alwaysAsId = true)
     @JoinColumn(name = "parent_id", nullable = false)
     @ManyToOne
@@ -53,6 +52,7 @@ public class Message implements Response{
     public Message(){}
 
     public Message(String accountId, String data, Channel parent){
+        this.type = Response.Type.MESSAGE;
         this.accountId = accountId;
         this.data = data;
         this.parent = parent;

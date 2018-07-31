@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 
 @RequiredArgsConstructor
 @Component("beforeSaveChannelValidator")
-public class BeforeSaveChannelValidator implements Validator {
+public class PutPatchChannelValidator implements Validator {
 
     private final ChannelRepository channelRepository;
 
@@ -31,13 +31,13 @@ public class BeforeSaveChannelValidator implements Validator {
     public void validate(Object target, Errors errors) {
         entityManager.detach(target);
         Channel newChannel = (Channel) target;
-        Channel oldChannel = channelRepository.findById(newChannel.getChannelId()).get();
+        Channel oldChannel = channelRepository.findByChannelName(newChannel.getChannelName());
 
-        ValidationUtils.rejectIfEmpty(errors, "name", "name.empty", Response.EmptyName);
+        ValidationUtils.rejectIfEmpty(errors, "channelName", "channelName.empty", Response.EmptyChannelName);
         ValidationUtils.rejectIfEmpty(errors, "status", "status.empty", Response.EmptyStatus);
 
-        if(!oldChannel.getName().equals(newChannel.getName())){
-            errors.rejectValue("name", "name.editNotAllowed", Response.NameEditNotAllowed);
+        if(!oldChannel.getChannelName().equals(newChannel.getChannelName())){
+            errors.rejectValue("channelName", "channelName.editNotAllowed", Response.ChannelNameEditNotAllowed);
         }
         if(!oldChannel.getDateOfCreation().equals(newChannel.getDateOfCreation())){
             errors.rejectValue("dateOfCreation", "dateOfCreation.editNotAllowed", Response.DateOfCreationEditNotAllowed);
@@ -51,11 +51,5 @@ public class BeforeSaveChannelValidator implements Validator {
         else if(newChannel.getStatus().equals(Channel.Status.CLOSED)){
             newChannel.setDateOfClosing(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
         }
-
-        /*System.out.println("NEW: " + newChannel.getChannelId() + " OLD: " + oldChannel.getChannelId());
-        System.out.println("NEW: " + newChannel.getName() + " OLD: " + oldChannel.getName());
-        System.out.println("NEW: " + newChannel.getStatus() + " OLD: " + oldChannel.getStatus());
-        System.out.println("NEW: " + newChannel.getDateOfCreation() + " OLD: " + oldChannel.getDateOfCreation());
-        System.out.println("NEW: " + newChannel.getDateOfClosing() + " OLD: " + oldChannel.getDateOfClosing());*/
     }
 }

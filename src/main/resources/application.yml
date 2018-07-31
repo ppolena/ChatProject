@@ -1,7 +1,7 @@
 spring:
   data:
     rest:
-      basePath: /chatApi
+      basePath: /api
   datasource:
     driver-class-name: org.postgresql.Driver
   jpa:

@@ -3,7 +3,6 @@ package ChatProject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,19 +32,18 @@ public class ChannelService {
                                    String channelName,
                                    String accountId,
                                    String data) throws IOException{
-        if(cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE)){
+        if (cr.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE)) {
             ObjectMapper objectMapper = new ObjectMapper();
-            Message message = new Message(accountId, data, cr.findByName(channelName));
+            Message message = new Message(accountId, data, cr.findByChannelName(channelName));
             mr.save(message);
             for (WebSocketSession webSocketSession : sessions.get(channelName)) {
                 webSocketSession.sendMessage(
                         new TextMessage(objectMapper.writeValueAsString(message)));
             }
-        }
-        else {
+        } else {
             session.sendMessage(
                     new TextMessage(new Gson()
-                            .toJson(new Error(Response.ChannelStatus + cr.findByName(channelName).getStatus()))));
+                            .toJson(new Error(Response.ChannelStatus + cr.findByChannelName(channelName).getStatus()))));
         }
     }
 
@@ -53,8 +51,8 @@ public class ChannelService {
                                              String accountId,
                                              String data){
         if((sessions.get(channelName) != null) &&
-                (cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
-            Message message = new Message(accountId, data, cr.findByName(channelName));
+                (cr.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
+            Message message = new Message(accountId, data, cr.findByChannelName(channelName));
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 for (WebSocketSession webSocketSession : sessions.get(channelName)) {
@@ -74,22 +72,22 @@ public class ChannelService {
             }
         }
         else if((sessions.get(channelName) == null) &&
-                (cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
+                (cr.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
             return new ResponseEntity<>(
                     new Error(  Response.SessionNotFound),
                                 new HttpHeaders(),
                                 HttpStatus.NOT_FOUND);
         }
         else if((sessions.get(channelName) == null) &&
-                !(cr.findByName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
+                !(cr.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
             return new ResponseEntity<>(
-                    new Error(Response.NoSessionChannelStatus + cr.findByName(channelName).getStatus()),
+                    new Error(Response.NoSessionChannelStatus + cr.findByChannelName(channelName).getStatus()),
                                     new HttpHeaders(),
                                     HttpStatus.NOT_FOUND);
         }
         else {
             return new ResponseEntity<>(
-                    new Error(Response.ChannelStatus + cr.findByName(channelName).getStatus()),
+                    new Error(Response.ChannelStatus + cr.findByChannelName(channelName).getStatus()),
                                     new HttpHeaders(),
                                     HttpStatus.FORBIDDEN);
         }

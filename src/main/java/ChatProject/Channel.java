@@ -16,13 +16,7 @@ public class Channel {
     @Id
     @NotNull
     @Column(updatable=false)
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String channelId;
-
-    @NotNull
-    @Column(updatable=false)
-    private String name;
+    private String channelName;
 
     @NotNull
     private Status status;
@@ -33,7 +27,7 @@ public class Channel {
 
     private String dateOfClosing;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy="parent", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy="parent", cascade = CascadeType.MERGE)
     private List<Message> listOfMessages;
 
     public enum Status{

@@ -14,13 +14,16 @@ public interface Response{
     String AuthorizationFailed = "AUTHORIZATION_FAILED";
     String NotAuthorizedToRead = "NOT_AUTHORIZED_TO_READ";
     String NotAuthorizedToWrite = "NOT_AUTHORIZED_TO_WRITE";
-    String EmptyName = "EMPTY_NAME";
+    String EmptyChannelName = "EMPTY_CHANNEL_NAME";
     String EmptyStatus = "EMPTY_STATUS";
     String EmptyAccountId = "EMPTY_ACCOUNT_ID";
     String EmptyParent = "EMPTY_PARENT";
     String EmptyData = "EMPTY_DATA";
     String NoSuchStatus = "NO_SUCH_STATUS";
-    String NameEditNotAllowed = "NAME_EDIT_NOT_ALLOWED";
+    String ChannelNameEditNotAllowed = "CHANNEL_NAME_EDIT_NOT_ALLOWED";
+    String MessageIdEditNotAllowed = "MESSAGE_ID_EDIT_NOT_ALLOWED";
+    String AccountIdEditNotAllowed = "ACCOUNT_ID_EDIT_NOT_ALLOWED";
+    String ParentEditNotAllowed = "PARENT_EDIT_NOT_ALLOWED";
     String DateOfCreationEditNotAllowed = "DATE_OF_CREATION_EDIT_NOT_ALLOWED";
     String DateOfClosingEditNotAllowed = "DATE_OF_CLOSING_EDIT_NOT_ALLOWED";
 

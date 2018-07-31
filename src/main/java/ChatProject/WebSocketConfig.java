@@ -17,13 +17,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final ChannelRepository cr;
-    private final MessageRepository mr;
-    private final ChannelService cs;
     private final AuthorizationService as;
+    private final ChannelRepository cr;
+    private final ChannelService cs;
 
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new SocketHandler(cr, mr, cs, as), "/chat/*")
+        registry.addHandler(new SocketHandler(as, cr, cs), "/chat/*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor(){
 
                     @Override
@@ -34,12 +33,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
                         String path = request.getURI().getPath();
                         String channelName = path.substring(path.lastIndexOf('/') + 1);
-
                         attributes.put("channelName", channelName);
                         attributes.put("authenticated", false);
-
-                        boolean b = super.beforeHandshake(request, response, wsHandler, attributes);
-                        return b;
+                        return super.beforeHandshake(request, response, wsHandler, attributes);
                     }
 
                     @Override
@@ -47,7 +43,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
                                                ServerHttpResponse response,
                                                WebSocketHandler wsHandler,
                                                @Nullable Exception ex) {
-
                         super.afterHandshake(request, response, wsHandler, ex);
                     }
                 });
