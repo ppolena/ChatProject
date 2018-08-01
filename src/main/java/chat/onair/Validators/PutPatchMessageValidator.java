@@ -1,5 +1,8 @@
-package ChatProject;
+package chat.onair.Validators;
 
+import chat.onair.Entities.Message;
+import chat.onair.Repositories.MessageRepository;
+import chat.onair.Interfaces.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;

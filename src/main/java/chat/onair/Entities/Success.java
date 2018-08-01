@@ -1,5 +1,6 @@
-package ChatProject;
+package chat.onair.Entities;
 
+import chat.onair.Interfaces.Response;
 import lombok.Data;
 
 import java.time.Instant;
@@ -7,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Data
-public class Success implements Response{
+public class Success implements Response {
     private String successId;
     private Type type;
     private String dateOfCreation;

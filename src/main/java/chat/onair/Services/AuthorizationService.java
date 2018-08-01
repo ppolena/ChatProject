@@ -1,5 +1,11 @@
-package ChatProject;
+package chat.onair.Services;
 
+import chat.onair.Entities.Error;
+import chat.onair.Entities.Message;
+import chat.onair.Repositories.ChannelRepository;
+import chat.onair.Repositories.MessageRepository;
+import chat.onair.Interfaces.Response;
+import chat.onair.Entities.Success;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
@@ -64,19 +70,13 @@ public class AuthorizationService {
             Map<String, String> messageJson,
             String channelName) throws IOException {
 
-        String token =
-                messageJson.get("authorization") == null ?
-                        "" : messageJson.get("authorization");
+        String token = messageJson.get("authorization") == null ? "" : messageJson.get("authorization");
 
-        String accountId =
-                messageJson.get("accountId") == null ?
-                        "guest" : messageJson.get("accountId");
+        String accountId = messageJson.get("accountId") == null ? "guest" : messageJson.get("accountId");
 
-        ResponseEntity response =
-                authenticate(
-                        accountId,
-                        channelName,
-                        token);
+        ResponseEntity response = authenticate( accountId,
+                                                channelName,
+                                                token);
 
         if(response.getStatusCode() == HttpStatus.OK){
 
@@ -99,14 +99,9 @@ public class AuthorizationService {
             else {
                 ObjectMapper objectMapper = new ObjectMapper();
 
-                List<Message> validMessages =
-                        messageRepository
-                                .findByParentAndDateOfCreationGreaterThan(
-                                        channelRepository
-                                                .findByChannelName(channelName),
-                                        (Instant.now()
-                                                .minusSeconds(30*60))
-                                                .toString());
+                List<Message> validMessages = messageRepository.findByParentAndDateOfCreationGreaterThan(
+                        channelRepository.findByChannelName(channelName),
+                        (Instant.now().minusSeconds(30*60)).toString());
 
                 for (Message m : validMessages) {
                     session.sendMessage(

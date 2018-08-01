@@ -1,4 +1,4 @@
-package ChatProject;
+package chat.onair;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

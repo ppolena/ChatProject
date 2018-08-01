@@ -1,4 +1,4 @@
-package ChatProject;
+package chat.onair.Registers;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,9 @@
-package ChatProject;
+package chat.onair.Validators;
 
 
+import chat.onair.Entities.Channel;
+import chat.onair.Repositories.ChannelRepository;
+import chat.onair.Interfaces.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -80,10 +83,7 @@ public class PutPatchChannelValidator implements Validator {
         }
         else if(newChannel.getStatus().equals(Channel.Status.CLOSED)){
 
-            newChannel.setDateOfClosing(
-                    DateTimeFormatter
-                            .ISO_INSTANT
-                            .format(Instant.now()));
+            newChannel.setDateOfClosing(DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
         }
     }
 }

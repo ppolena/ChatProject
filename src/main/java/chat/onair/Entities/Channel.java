@@ -1,4 +1,4 @@
-package ChatProject;
+package chat.onair.Entities;
 
 import lombok.Data;
 import javax.persistence.*;

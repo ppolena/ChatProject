@@ -1,5 +1,10 @@
-package ChatProject;
+package chat.onair.Handlers;
 
+import chat.onair.Entities.Error;
+import chat.onair.Interfaces.Response;
+import chat.onair.Repositories.ChannelRepository;
+import chat.onair.Services.AuthorizationService;
+import chat.onair.Services.ChannelService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -68,8 +73,9 @@ public class SocketHandler extends TextWebSocketHandler {
         }
         else{
             session.sendMessage(
-                    new TextMessage(new Gson()
-                            .toJson(new Error(Response.ChannelNotFound))));
+                    new TextMessage(
+                            new Gson().toJson(
+                                    new Error(Response.ChannelNotFound))));
         }
     }
 }

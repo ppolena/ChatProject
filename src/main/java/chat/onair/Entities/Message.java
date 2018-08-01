@@ -1,5 +1,6 @@
-package ChatProject;
+package chat.onair.Entities;
 
+import chat.onair.Interfaces.Response;
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @Table(name = "message")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Message implements Response{
+public class Message implements Response {
 
     @Id
     @NotNull

@@ -1,5 +1,11 @@
-package ChatProject;
+package chat.onair.Validators;
 
+import chat.onair.Entities.Error;
+import chat.onair.Entities.Message;
+import chat.onair.Repositories.ChannelRepository;
+import chat.onair.Interfaces.Response;
+import chat.onair.Services.AuthorizationService;
+import chat.onair.Services.ChannelService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -53,11 +59,10 @@ public class PostMessageValidator implements Validator{
         else {
             message.setParent(channelRepository.findByChannelName(message.getChannelName()));
 
-            ResponseEntity response =
-                    authorizationService.authenticate(
-                            message.getAccountId(),
-                            message.getParent().getChannelName(),
-                            message.getAuthorization());
+            ResponseEntity response = authorizationService.authenticate(
+                    message.getAccountId(),
+                    message.getParent().getChannelName(),
+                    message.getAuthorization());
 
             if (response.getStatusCode() == HttpStatus.OK) {
 

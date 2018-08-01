@@ -1,5 +1,12 @@
-package ChatProject;
+package chat.onair.Services;
 
+import chat.onair.Entities.Channel;
+import chat.onair.Entities.Error;
+import chat.onair.Entities.Message;
+import chat.onair.Entities.Success;
+import chat.onair.Interfaces.Response;
+import chat.onair.Repositories.ChannelRepository;
+import chat.onair.Repositories.MessageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +43,7 @@ public class ChannelService {
             String data)
             throws IOException{
 
-        if (channelRepository
-                .findByChannelName(channelName)
-                .getStatus()
-                .equals(Channel.Status.ACTIVE)) {
+        if (channelRepository.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE)) {
 
             ObjectMapper objectMapper = new ObjectMapper();
 
@@ -51,6 +55,7 @@ public class ChannelService {
             mr.save(message);
 
             for (WebSocketSession webSocketSession : sessions.get(channelName)) {
+
                 webSocketSession.sendMessage(
                         new TextMessage(
                                 objectMapper.writeValueAsString(message)));
@@ -58,11 +63,12 @@ public class ChannelService {
         }
         else {
             session.sendMessage(
-                    new TextMessage(new Gson()
-                            .toJson(new Error(Response.ChannelStatus
-                                    + channelRepository
-                                    .findByChannelName(channelName)
-                                    .getStatus()))));
+                    new TextMessage(
+                            new Gson().toJson(
+                                    new Error(Response.ChannelStatus
+                                            + channelRepository
+                                            .findByChannelName(channelName)
+                                            .getStatus()))));
         }
     }
 
@@ -87,10 +93,9 @@ public class ChannelService {
                 ObjectMapper objectMapper = new ObjectMapper();
 
                 for (WebSocketSession webSocketSession : sessions.get(channelName)) {
+
                     webSocketSession.sendMessage(
-                            new TextMessage(
-                                    objectMapper
-                                            .writeValueAsString(message)));
+                            new TextMessage(objectMapper.writeValueAsString(message)));
                 }
 
                 return new ResponseEntity<>(
@@ -152,9 +157,7 @@ public class ChannelService {
             List<WebSocketSession> sessionList = new ArrayList<>();
             sessionList.add(session);
             sessions.put(
-                    (String)session
-                            .getAttributes()
-                            .get("channelName"),
+                    (String)session.getAttributes().get("channelName"),
                     sessionList);
         }
     }
