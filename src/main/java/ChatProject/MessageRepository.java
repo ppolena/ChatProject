@@ -9,10 +9,13 @@ import java.util.List;
 
 @RepositoryRestResource(collectionResourceRel = "messages", path = "messages")
 public interface MessageRepository extends JpaRepository<Message, String>{
+
     @RestResource(path = "findByMessageId")
     Message findByMessageId(@Param("messageId") String messageId);
+
     @RestResource(path = "findByAccountId")
     List<Message> findByAccountId(@Param("accountId") String accountId);
+
     @RestResource(path = "listMessages")
     List<Message> findByParentAndDateOfCreationGreaterThan(
             @Param("parent")Channel parent,
