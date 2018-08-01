@@ -21,21 +21,38 @@ public class SocketHandler extends TextWebSocketHandler {
     private final ChannelService channelService;
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException{
+    public void handleTextMessage(
+            WebSocketSession session,
+            TextMessage message)
+            throws IOException{
 
         Map<String, String> messageJson = new Gson().fromJson(message.getPayload(), Map.class);
 
         String channelName = (String) session.getAttributes().get("channelName");
 
-        if(messageJson.get("type").equals("authorization") && !(boolean)session.getAttributes().get("authenticated")){
-            authorizationService.handleAuthorizationMessage(session,messageJson,channelName);
+        if(messageJson.get("type").equals("authorization") &&
+                !(boolean)session.getAttributes().get("authenticated")){
+
+            authorizationService.handleAuthorizationMessage(
+                    session,
+                    messageJson,
+                    channelName);
         }
         else {
-            if((boolean)session.getAttributes().get("authenticated") && (boolean)session.getAttributes().get("canWrite")) {
-                channelService.saveAndSendMessage(session, channelName, (String) session.getAttributes().get("accountId"), messageJson.get("data"));
+            if((boolean)session.getAttributes().get("authenticated") &&
+                    (boolean)session.getAttributes().get("canWrite")) {
+
+                channelService.saveAndSendMessage(
+                        session,
+                        channelName,
+                        (String) session.getAttributes().get("accountId"),
+                        messageJson.get("data"));
             }
             else{
-                session.sendMessage(new TextMessage(new Gson().toJson(new Error(Response.NotAuthorizedToWrite))));
+                session.sendMessage(
+                        new TextMessage(
+                                new Gson().toJson(
+                                        new Error(Response.NotAuthorizedToWrite))));
             }
         }
     }
@@ -46,6 +63,7 @@ public class SocketHandler extends TextWebSocketHandler {
         String channelName = (String) session.getAttributes().get("channelName");
 
         if(channelRepository.findByChannelName(channelName) != null) {
+
             channelService.addSession(session);
         }
         else{

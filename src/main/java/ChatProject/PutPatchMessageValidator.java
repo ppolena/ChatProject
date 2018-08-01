@@ -26,20 +26,40 @@ public class PutPatchMessageValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
+
         entityManager.detach(target);
+
         Message newMessage = (Message) target;
         Message oldMessage = messageRepository.findByMessageId(newMessage.getMessageId());
 
-        ValidationUtils.rejectIfEmpty(errors, "data", "data.empty", Response.EmptyData);
+        ValidationUtils.rejectIfEmpty(
+                errors,
+                "data",
+                "data.empty",
+                Response.EmptyData);
 
         if(!oldMessage.getMessageId().equals(newMessage.getMessageId())){
-            errors.rejectValue("messageId", "messageId.editNotAllowed", Response.MessageIdEditNotAllowed);
+
+            errors.rejectValue(
+                    "messageId",
+                    "messageId.editNotAllowed",
+                    Response.MessageIdEditNotAllowed);
         }
+
         if(!oldMessage.getDateOfCreation().equals(newMessage.getDateOfCreation())){
-            errors.rejectValue("dateOfCreation", "dateOfCreation.editNotAllowed", Response.DateOfCreationEditNotAllowed);
+
+            errors.rejectValue(
+                    "dateOfCreation",
+                    "dateOfCreation.editNotAllowed",
+                    Response.DateOfCreationEditNotAllowed);
         }
+
         if(!oldMessage.getAccountId().equals(newMessage.getAccountId())){
-            errors.rejectValue("accountId", "accountId.editNotAllowed", Response.AccountIdEditNotAllowed);
+
+            errors.rejectValue(
+                    "accountId",
+                    "accountId.editNotAllowed",
+                    Response.AccountIdEditNotAllowed);
         }
     }
 }

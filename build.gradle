@@ -40,5 +40,5 @@ dependencies {
 	compile("org.webjars:bootstrap:3.3.7")
 	compile("org.webjars:jquery:3.1.0")
     compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.24.0.RELEASE'
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

@@ -22,29 +22,35 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final ChannelService cs;
 
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new SocketHandler(as, cr, cs), "/chat/*")
+        registry.addHandler(
+                new SocketHandler(as, cr, cs),
+                "/chat/*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor(){
 
                     @Override
-                    public boolean beforeHandshake(ServerHttpRequest request,
-                                                   ServerHttpResponse response,
-                                                   WebSocketHandler wsHandler,
-                                                   Map<String, Object> attributes) throws Exception {
+                    public boolean beforeHandshake(
+                            ServerHttpRequest request,
+                            ServerHttpResponse response,
+                            WebSocketHandler wsHandler,
+                            Map<String, Object> attributes) throws Exception {
 
                         String path = request.getURI().getPath();
                         String channelName = path.substring(path.lastIndexOf('/') + 1);
                         attributes.put("channelName", channelName);
                         attributes.put("authenticated", false);
+
                         return super.beforeHandshake(request, response, wsHandler, attributes);
                     }
 
                     @Override
-                    public void afterHandshake(ServerHttpRequest request,
-                                               ServerHttpResponse response,
-                                               WebSocketHandler wsHandler,
-                                               @Nullable Exception ex) {
+                    public void afterHandshake(
+
+                            ServerHttpRequest request,
+                            ServerHttpResponse response,
+                            WebSocketHandler wsHandler,
+                            @Nullable Exception ex) {
+
                         super.afterHandshake(request, response, wsHandler, ex);
-                    }
-                });
+                    }});
     }
 }

@@ -23,56 +23,128 @@ public class AuthorizationService {
     private final MessageRepository messageRepository;
     private final ChannelService channelService;
 
-    public ResponseEntity authenticate(String accountId, String channelName, String token){
-        String url = "https://dev.onair-backend.moon42.com/api/business-layer/v1/chat/account/" + accountId + "/channel/" + channelName;
+    public ResponseEntity authenticate(
+            String accountId,
+            String channelName,
+            String token){
+
+        String url = getApiUrl(accountId, channelName);
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        if(!token.isEmpty()) headers.add("authorization", token);
+
+        if(!token.isEmpty()) {
+            headers.add("authorization", token);
+        }
+
         HttpEntity entity = new HttpEntity(headers);
+
         try{
-            HttpEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+            HttpEntity<String> response =
+                    restTemplate.exchange(
+                            url,
+                            HttpMethod.GET,
+                            entity,
+                            String.class);
+
+            return new ResponseEntity<>(
+                    response,
+                    new HttpHeaders(),
+                    HttpStatus.OK);
         }
         catch(HttpServerErrorException e){
-            return new ResponseEntity<>(new Error(Response.AuthorizationFailed), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(
+                    new Error(Response.AuthorizationFailed),
+                    new HttpHeaders(),
+                    HttpStatus.UNAUTHORIZED);
         }
     }
 
-    public void handleAuthorizationMessage(WebSocketSession session, Map<String, String> messageJson, String channelName) throws IOException {
-        String token = messageJson.get("authorization") == null ? "" : messageJson.get("authorization");
-        String accountId = messageJson.get("accountId") == null ? "guest" : messageJson.get("accountId");
+    public void handleAuthorizationMessage(
+            WebSocketSession session,
+            Map<String, String> messageJson,
+            String channelName) throws IOException {
 
-        ResponseEntity response = authenticate(accountId,channelName,token);
+        String token =
+                messageJson.get("authorization") == null ?
+                        "" : messageJson.get("authorization");
+
+        String accountId =
+                messageJson.get("accountId") == null ?
+                        "guest" : messageJson.get("accountId");
+
+        ResponseEntity response =
+                authenticate(
+                        accountId,
+                        channelName,
+                        token);
+
         if(response.getStatusCode() == HttpStatus.OK){
+
             String body = ((HttpEntity<String>)(response.getBody())).getBody();
+
             Map<String, Object> responseJson = new Gson().fromJson(body, Map.class);
+
             if(!(boolean)responseJson.get("canRead")){
-                channelService.getSessions().get(channelName).remove(session);
+
+                channelService
+                        .getSessions()
+                        .get(channelName)
+                        .remove(session);
+
                 session.sendMessage(
-                        new TextMessage(new Gson().toJson(new Error(Response.NotAuthorizedToRead))));
+                        new TextMessage(
+                                new Gson().toJson(
+                                        new Error(Response.NotAuthorizedToRead))));
             }
             else {
                 ObjectMapper objectMapper = new ObjectMapper();
-                List<Message> validMessages = messageRepository.findByParentAndDateOfCreationGreaterThan(
-                        channelRepository.findByChannelName(channelName), (Instant.now().minusSeconds(30*60)).toString());
+
+                List<Message> validMessages =
+                        messageRepository
+                                .findByParentAndDateOfCreationGreaterThan(
+                                        channelRepository
+                                                .findByChannelName(channelName),
+                                        (Instant.now()
+                                                .minusSeconds(30*60))
+                                                .toString());
+
                 for (Message m : validMessages) {
-                    session.sendMessage(new TextMessage(
-                            objectMapper.writeValueAsString(m)));
+                    session.sendMessage(
+                            new TextMessage(
+                                    objectMapper.writeValueAsString(m)));
                 }
+
                 session.getAttributes().put("authenticated", true);
                 session.getAttributes().put("canRead", (boolean)responseJson.get("canRead"));
                 session.getAttributes().put("canWrite", (boolean)responseJson.get("canWrite"));
+
                 if(responseJson.get("profilePictureId") != null) {
                     session.getAttributes().put("profilePictureId", responseJson.get("profilePictureId"));
                 }
+
                 session.getAttributes().put("accountId", accountId);
+
                 session.sendMessage(
-                        new TextMessage(new Gson().toJson(new Success(Response.AuthorizationSuccessful))));
+                        new TextMessage(
+                                new Gson().toJson(
+                                        new Success(Response.AuthorizationSuccessful))));
             }
         }
         else{
             session.sendMessage(
-                    new TextMessage(new Gson().toJson(response.getBody())));
+                    new TextMessage(
+                            new Gson().toJson(response.getBody())));
         }
+    }
+
+    private String getApiUrl(
+            String accountId,
+            String channelName){
+
+        String apiUrl = System.getenv("userAuthenticationApi");
+        apiUrl = apiUrl.replace("accountId", accountId);
+        apiUrl = apiUrl.replace("channelName", channelName);
+
+        return apiUrl;
     }
 }

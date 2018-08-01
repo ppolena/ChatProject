@@ -30,25 +30,61 @@ public class PostMessageValidator implements Validator{
 
         Message message = (Message) target;
 
-        ValidationUtils.rejectIfEmpty(errors, "accountId", "accountId.empty", Response.EmptyAccountId);
-        ValidationUtils.rejectIfEmpty(errors, "data", "data.empty", Response.EmptyData);
+        ValidationUtils.rejectIfEmpty(
+                errors,
+                "accountId",
+                "accountId.empty",
+                Response.EmptyAccountId);
 
-        if(message.getChannelName() == null || channelRepository.findByChannelName(message.getChannelName()) == null){
-            errors.rejectValue("channelName", "channelName.notFound", Response.ChannelNotFound);
+        ValidationUtils.rejectIfEmpty(
+                errors,
+                "data",
+                "data.empty",
+                Response.EmptyData);
+
+        if(message.getChannelName() == null ||
+                channelRepository.findByChannelName(message.getChannelName()) == null){
+
+            errors.rejectValue(
+                    "channelName",
+                    "channelName.notFound",
+                    Response.ChannelNotFound);
         }
         else {
             message.setParent(channelRepository.findByChannelName(message.getChannelName()));
-            ResponseEntity response = authorizationService.authenticate(message.getAccountId(), message.getParent().getChannelName(), message.getAuthorization());
+
+            ResponseEntity response =
+                    authorizationService.authenticate(
+                            message.getAccountId(),
+                            message.getParent().getChannelName(),
+                            message.getAuthorization());
+
             if (response.getStatusCode() == HttpStatus.OK) {
+
                 String body = ((HttpEntity<String>)(response.getBody())).getBody();
+
                 Map<String, Object> responseJson = new Gson().fromJson(body, Map.class);
+
                 if (!(boolean) responseJson.get("canWrite")) {
-                    errors.rejectValue("accountId", "accountId.cannotWrite", Response.NotAuthorizedToWrite);
+
+                    errors.rejectValue(
+                            "accountId",
+                            "accountId.cannotWrite",
+                            Response.NotAuthorizedToWrite);
                 }
                 else{
-                    response = channelService.saveAndSendMessage(message.getParent().getChannelName(), message.getAccountId(), message.getData());
+
+                    response = channelService.saveAndSendMessage(
+                            message.getParent().getChannelName(),
+                            message.getAccountId(),
+                            message.getData());
+
                     if(response.getStatusCode() != HttpStatus.CREATED){
-                        errors.rejectValue("accountId", "accountId.authorizationFailed", ((Error)response.getBody()).getData());
+
+                        errors.rejectValue(
+                                "accountId",
+                                "accountId.authorizationFailed",
+                                ((Error)response.getBody()).getData());
                     }
                 }
             }

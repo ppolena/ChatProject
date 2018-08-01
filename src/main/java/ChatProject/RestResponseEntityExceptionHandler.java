@@ -15,20 +15,26 @@ public class RestResponseEntityExceptionHandler extends
         ResponseEntityExceptionHandler {
 
     @ExceptionHandler({ RepositoryConstraintViolationException.class })
-    public ResponseEntity<Object> handleAccessDeniedException(
-            Exception ex, WebRequest request) {
-        RepositoryConstraintViolationException exception =
-                (RepositoryConstraintViolationException) ex;
-        return new ResponseEntity<>( exception.getErrors().getFieldErrors(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatus status,
-                                                                  WebRequest request){
+    public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
+
+        RepositoryConstraintViolationException exception = (RepositoryConstraintViolationException) ex;
+
         return new ResponseEntity<>(
-                            new Error(Response.NoSuchStatus),
-                            new HttpHeaders(),
-                            HttpStatus.NOT_FOUND);
+                exception.getErrors().getFieldErrors(),
+                new HttpHeaders(),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request){
+
+        return new ResponseEntity<>(
+                new Error(Response.NoSuchStatus),
+                new HttpHeaders(),
+                HttpStatus.NOT_FOUND);
     }
 }
