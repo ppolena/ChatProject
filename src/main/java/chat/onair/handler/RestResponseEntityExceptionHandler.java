@@ -1,7 +1,7 @@
-package chat.onair.Handlers;
+package chat.onair.handler;
 
-import chat.onair.Entities.Error;
-import chat.onair.Interfaces.Response;
+import chat.onair.response.Error;
+import chat.onair.response.Response;
 import org.springframework.data.rest.core.RepositoryConstraintViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

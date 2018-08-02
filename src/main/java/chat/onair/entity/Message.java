@@ -1,6 +1,6 @@
-package chat.onair.Entities;
+package chat.onair.entity;
 
-import chat.onair.Interfaces.Response;
+import chat.onair.response.Response;
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;

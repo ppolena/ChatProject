@@ -1,7 +1,7 @@
-package chat.onair.Repositories;
+package chat.onair.repository;
 
-import chat.onair.Entities.Channel;
-import chat.onair.Entities.Message;
+import chat.onair.entity.Channel;
+import chat.onair.entity.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;

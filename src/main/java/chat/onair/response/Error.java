@@ -1,6 +1,6 @@
-package chat.onair.Entities;
+package chat.onair.response;
 
-import chat.onair.Interfaces.Response;
+import chat.onair.response.Response;
 import lombok.Data;
 
 import java.time.Instant;

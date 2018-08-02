@@ -1,11 +1,11 @@
-package chat.onair.Services;
+package chat.onair.service;
 
-import chat.onair.Entities.Error;
-import chat.onair.Entities.Message;
-import chat.onair.Repositories.ChannelRepository;
-import chat.onair.Repositories.MessageRepository;
-import chat.onair.Interfaces.Response;
-import chat.onair.Entities.Success;
+import chat.onair.response.Error;
+import chat.onair.entity.Message;
+import chat.onair.repository.ChannelRepository;
+import chat.onair.repository.MessageRepository;
+import chat.onair.response.Response;
+import chat.onair.response.Success;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;

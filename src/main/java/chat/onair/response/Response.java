@@ -1,4 +1,4 @@
-package chat.onair.Interfaces;
+package chat.onair.response;
 
 public interface Response{
     String ChannelCreationSuccessful = "CHANNEL_CREATION_SUCCESSFUL";

@@ -1,7 +1,7 @@
-package chat.onair.Configs;
+package chat.onair.config;
 
-import chat.onair.Entities.Channel;
-import chat.onair.Entities.Message;
+import chat.onair.entity.Channel;
+import chat.onair.entity.Message;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;

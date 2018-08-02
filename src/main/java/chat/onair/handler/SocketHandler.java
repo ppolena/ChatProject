@@ -1,10 +1,10 @@
-package chat.onair.Handlers;
+package chat.onair.handler;
 
-import chat.onair.Entities.Error;
-import chat.onair.Interfaces.Response;
-import chat.onair.Repositories.ChannelRepository;
-import chat.onair.Services.AuthorizationService;
-import chat.onair.Services.ChannelService;
+import chat.onair.response.Error;
+import chat.onair.response.Response;
+import chat.onair.repository.ChannelRepository;
+import chat.onair.service.AuthorizationService;
+import chat.onair.service.ChannelService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Configurable;

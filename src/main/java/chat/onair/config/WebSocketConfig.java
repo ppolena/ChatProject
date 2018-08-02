@@ -1,9 +1,9 @@
-package chat.onair.Configs;
+package chat.onair.config;
 
-import chat.onair.Repositories.ChannelRepository;
-import chat.onair.Services.AuthorizationService;
-import chat.onair.Services.ChannelService;
-import chat.onair.Handlers.SocketHandler;
+import chat.onair.repository.ChannelRepository;
+import chat.onair.service.AuthorizationService;
+import chat.onair.service.ChannelService;
+import chat.onair.handler.SocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;

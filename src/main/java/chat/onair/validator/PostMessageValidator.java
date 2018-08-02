@@ -1,11 +1,11 @@
-package chat.onair.Validators;
+package chat.onair.validator;
 
-import chat.onair.Entities.Error;
-import chat.onair.Entities.Message;
-import chat.onair.Repositories.ChannelRepository;
-import chat.onair.Interfaces.Response;
-import chat.onair.Services.AuthorizationService;
-import chat.onair.Services.ChannelService;
+import chat.onair.response.Error;
+import chat.onair.entity.Message;
+import chat.onair.repository.ChannelRepository;
+import chat.onair.response.Response;
+import chat.onair.service.AuthorizationService;
+import chat.onair.service.ChannelService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
