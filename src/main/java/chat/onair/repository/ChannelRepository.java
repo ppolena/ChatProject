@@ -9,6 +9,6 @@ import org.springframework.data.rest.core.annotation.RestResource;
 @RepositoryRestResource(collectionResourceRel = "channels", path = "channels")
 public interface ChannelRepository extends JpaRepository<Channel, String> {
 
-    @RestResource(path = "findByChannelName")
-    Channel findByChannelName(@Param("channelName") String channelName);
+    @RestResource(path = "find-by-channel-name")
+    Channel findByChannelName(@Param("name") String name);
 }

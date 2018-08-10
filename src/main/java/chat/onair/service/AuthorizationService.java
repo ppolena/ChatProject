@@ -29,10 +29,9 @@ public class AuthorizationService {
     private final MessageRepository messageRepository;
     private final ChannelService channelService;
 
-    public ResponseEntity authenticate(
-            String accountId,
-            String channelName,
-            String token){
+    public ResponseEntity authenticate(String accountId,
+                                       String channelName,
+                                       String token){
 
         String url = getApiUrl(accountId, channelName);
         RestTemplate restTemplate = new RestTemplate();
@@ -45,30 +44,24 @@ public class AuthorizationService {
         HttpEntity entity = new HttpEntity(headers);
 
         try{
-            HttpEntity<String> response =
-                    restTemplate.exchange(
-                            url,
-                            HttpMethod.GET,
-                            entity,
-                            String.class);
-
-            return new ResponseEntity<>(
-                    response,
-                    new HttpHeaders(),
-                    HttpStatus.OK);
+            HttpEntity<String> response = restTemplate.exchange(url,
+                                                                HttpMethod.GET,
+                                                                entity,
+                                                                String.class);
+            return new ResponseEntity<>(response,
+                                        new HttpHeaders(),
+                                        HttpStatus.OK);
         }
         catch(HttpServerErrorException e){
-            return new ResponseEntity<>(
-                    new Error(Response.AuthorizationFailed),
-                    new HttpHeaders(),
-                    HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new Error(Response.AuthorizationFailed),
+                                        new HttpHeaders(),
+                                        HttpStatus.UNAUTHORIZED);
         }
     }
 
-    public void handleAuthorizationMessage(
-            WebSocketSession session,
-            Map<String, String> messageJson,
-            String channelName) throws IOException {
+    public void handleAuthorizationMessage( WebSocketSession session,
+                                            Map<String, String> messageJson,
+                                            String channelName) throws IOException {
 
         String token = messageJson.get("authorization") == null ? "" : messageJson.get("authorization");
 
@@ -86,10 +79,7 @@ public class AuthorizationService {
 
             if(!(boolean)responseJson.get("canRead")){
 
-                channelService
-                        .getSessions()
-                        .get(channelName)
-                        .remove(session);
+                channelService.getSessions().get(channelName).remove(session);
 
                 session.sendMessage(
                         new TextMessage(
@@ -99,9 +89,10 @@ public class AuthorizationService {
             else {
                 ObjectMapper objectMapper = new ObjectMapper();
 
-                List<Message> validMessages = messageRepository.findByParentAndDateOfCreationGreaterThan(
-                        channelRepository.findByChannelName(channelName),
-                        (Instant.now().minusSeconds(30*60)).toString());
+                List<Message> validMessages =
+                        messageRepository.findByParentAndDateOfCreationGreaterThan(
+                                channelRepository.findByChannelName(channelName),
+                                (Instant.now().minusSeconds(30*60)).toString());
 
                 for (Message m : validMessages) {
                     session.sendMessage(
@@ -132,9 +123,7 @@ public class AuthorizationService {
         }
     }
 
-    private String getApiUrl(
-            String accountId,
-            String channelName){
+    private String getApiUrl(String accountId, String channelName){
 
         String apiUrl = System.getenv("userAuthenticationApi");
         apiUrl = apiUrl.replace("accountId", accountId);

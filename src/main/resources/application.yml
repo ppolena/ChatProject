@@ -1,9 +1,7 @@
 spring:
   data:
     rest:
-      basePath: /api
-  datasource:
-    driver-class-name: org.postgresql.Driver
+      basePath: /api/chat
   jpa:
     show-sql: true
     hibernate:

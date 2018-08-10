@@ -38,48 +38,42 @@ public class PutPatchChannelValidator implements Validator {
         Channel newChannel = (Channel) target;
         Channel oldChannel = channelRepository.findByChannelName(newChannel.getChannelName());
 
-        ValidationUtils.rejectIfEmpty(
-                errors,
-                "channelName",
-                "channelName.empty",
-                Response.EmptyChannelName);
+        ValidationUtils.rejectIfEmpty(  errors,
+                                        "channelName",
+                                        "channelName.empty",
+                                        Response.EmptyChannelName);
 
-        ValidationUtils.rejectIfEmpty(
-                errors,
-                "status",
-                "status.empty",
-                Response.EmptyStatus);
+        ValidationUtils.rejectIfEmpty(  errors,
+                                        "status",
+                                        "status.empty",
+                                        Response.EmptyStatus);
 
         if(!oldChannel.getChannelName().equals(newChannel.getChannelName())){
 
-            errors.rejectValue(
-                    "channelName",
-                    "channelName.editNotAllowed",
-                    Response.ChannelNameEditNotAllowed);
+            errors.rejectValue( "channelName",
+                                "channelName.editNotAllowed",
+                                Response.ChannelNameEditNotAllowed);
         }
 
         if(!oldChannel.getDateOfCreation().equals(newChannel.getDateOfCreation())){
 
-            errors.rejectValue(
-                    "dateOfCreation",
-                    "dateOfCreation.editNotAllowed",
-                    Response.DateOfCreationEditNotAllowed);
+            errors.rejectValue( "dateOfCreation",
+                                "dateOfCreation.editNotAllowed",
+                                Response.DateOfCreationEditNotAllowed);
         }
 
         if(oldChannel.getDateOfClosing() == null && newChannel.getDateOfClosing() != null){
 
-            errors.rejectValue(
-                    "dateOfClosing",
-                    "dateOfClosing.editNotAllowed",
-                    Response.DateOfClosingEditNotAllowed);
+            errors.rejectValue( "dateOfClosing",
+                                "dateOfClosing.editNotAllowed",
+                                Response.DateOfClosingEditNotAllowed);
         }
 
         if(oldChannel.getStatus().equals(Channel.Status.CLOSED)){
 
-            errors.rejectValue(
-                    "status",
-                    "status.closed",
-                    Response.ChannelStatus + Channel.Status.CLOSED);
+            errors.rejectValue( "status",
+                                "status.closed",
+                                Response.ChannelStatus + Channel.Status.CLOSED);
         }
         else if(newChannel.getStatus().equals(Channel.Status.CLOSED)){
 

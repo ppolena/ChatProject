@@ -25,24 +25,21 @@ public class PostChannelValidator implements Validator {
 
         Channel channel = (Channel) target;
 
-        ValidationUtils.rejectIfEmpty(
-                errors,
-                "channelName",
-                "channelName.empty",
-                Response.EmptyChannelName);
+        ValidationUtils.rejectIfEmpty(  errors,
+                                        "channelName",
+                                        "channelName.empty",
+                                        Response.EmptyChannelName);
 
-        ValidationUtils.rejectIfEmpty(
-                errors,
-                "status",
-                "status.empty",
-                Response.EmptyStatus);
+        ValidationUtils.rejectIfEmpty(  errors,
+                                        "status",
+                                        "status.empty",
+                                        Response.EmptyStatus);
 
         if(channelRepository.findByChannelName(channel.getChannelName()) != null){
 
-            errors.rejectValue(
-                    "channelName",
-                    "channelName.exists",
-                    Response.ChannelAlreadyExists);
+            errors.rejectValue( "channelName",
+                                "channelName.exists",
+                                Response.ChannelAlreadyExists);
         }
     }
 }

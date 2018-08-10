@@ -26,6 +26,7 @@ public interface Response{
     String ParentEditNotAllowed = "PARENT_EDIT_NOT_ALLOWED";
     String DateOfCreationEditNotAllowed = "DATE_OF_CREATION_EDIT_NOT_ALLOWED";
     String DateOfClosingEditNotAllowed = "DATE_OF_CLOSING_EDIT_NOT_ALLOWED";
+    String ObjectMapperIoException = "OBJECT_MAPPER_IO_EXCEPTION";
 
     enum Type{
         MESSAGE, ERROR, SUCCESS

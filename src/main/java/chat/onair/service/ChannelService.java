@@ -27,7 +27,7 @@ import java.util.Map;
 public class ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final MessageRepository mr;
+    private final MessageRepository messageRepository;
 
     private Map<String, List<WebSocketSession>> sessions = new HashMap<>();
 
@@ -36,23 +36,21 @@ public class ChannelService {
         return sessions;
     }
 
-    public void saveAndSendMessage(
-            WebSocketSession session,
-            String channelName,
-            String accountId,
-            String data)
-            throws IOException{
+    public void saveAndSendMessage( WebSocketSession session,
+                                    String channelName,
+                                    String accountId,
+                                    String data)
+                                    throws IOException{
 
         if (channelRepository.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE)) {
 
             ObjectMapper objectMapper = new ObjectMapper();
 
-            Message message = new Message(
-                    accountId,
-                    data,
-                    channelRepository.findByChannelName(channelName));
+            Message message = new Message(  accountId,
+                                            data,
+                                            channelRepository.findByChannelName(channelName));
 
-            mr.save(message);
+            messageRepository.save(message);
 
             for (WebSocketSession webSocketSession : sessions.get(channelName)) {
 
@@ -65,10 +63,8 @@ public class ChannelService {
             session.sendMessage(
                     new TextMessage(
                             new Gson().toJson(
-                                    new Error(Response.ChannelStatus
-                                            + channelRepository
-                                            .findByChannelName(channelName)
-                                            .getStatus()))));
+                                    new Error(  Response.ChannelStatus
+                                                + channelRepository.findByChannelName(channelName).getStatus()))));
         }
     }
 
@@ -77,88 +73,63 @@ public class ChannelService {
             String accountId,
             String data){
 
-        if((sessions.get(channelName) != null) &&
-                (channelRepository
-                        .findByChannelName(channelName)
-                        .getStatus()
-                        .equals(Channel.Status.ACTIVE))){
+        if(sessions.get(channelName) != null &&
+                channelRepository.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE)){
 
-            Message message = new Message(
-                    accountId,
-                    data,
-                    channelRepository.findByChannelName(channelName));
+            Message message = new Message(  accountId,
+                                            data,
+                                            channelRepository.findByChannelName(channelName));
 
             try {
-
                 ObjectMapper objectMapper = new ObjectMapper();
 
                 for (WebSocketSession webSocketSession : sessions.get(channelName)) {
-
                     webSocketSession.sendMessage(
                             new TextMessage(objectMapper.writeValueAsString(message)));
                 }
 
-                return new ResponseEntity<>(
-                        new Success(Response.MessageCreationSuccessful),
-                        new HttpHeaders(),
-                        HttpStatus.CREATED);
+                return new ResponseEntity<>(new Success(Response.MessageCreationSuccessful),
+                                            new HttpHeaders(),
+                                            HttpStatus.CREATED);
             }
             catch(IOException e){
-
-                return new ResponseEntity<>(
-                        new Error("OBJECT_MAPPER_IO_EXCEPTION"),
-                        new HttpHeaders(),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new Error(Response.ObjectMapperIoException),
+                                            new HttpHeaders(),
+                                            HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         else if(sessions.get(channelName) == null &&
-                channelRepository
-                        .findByChannelName(channelName)
-                        .getStatus()
-                        .equals(Channel.Status.ACTIVE)){
+                channelRepository.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE)){
 
-            return new ResponseEntity<>(
-                    new Error(Response.SessionNotFound),
-                    new HttpHeaders(),
-                    HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Error(Response.SessionNotFound),
+                                        new HttpHeaders(),
+                                        HttpStatus.NOT_FOUND);
         }
-        else if((sessions.get(channelName) == null) &&
-                !(channelRepository
-                        .findByChannelName(channelName)
-                        .getStatus()
-                        .equals(Channel.Status.ACTIVE))){
+        else if(sessions.get(channelName) == null &&
+                !(channelRepository.findByChannelName(channelName).getStatus().equals(Channel.Status.ACTIVE))){
 
-            return new ResponseEntity<>(
-                    new Error(Response.NoSessionChannelStatus
-                            + channelRepository
-                            .findByChannelName(channelName)
-                            .getStatus()),
-                    new HttpHeaders(),
-                    HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Error(  Response.NoSessionChannelStatus
+                                                    + channelRepository.findByChannelName(channelName).getStatus()),
+                                        new HttpHeaders(),
+                                        HttpStatus.NOT_FOUND);
         }
         else {
-            return new ResponseEntity<>(
-                    new Error(Response.ChannelStatus
-                            + channelRepository
-                            .findByChannelName(channelName)
-                            .getStatus()),
-                    new HttpHeaders(),
-                    HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new Error(  Response.ChannelStatus
+                                                    + channelRepository.findByChannelName(channelName).getStatus()),
+                                        new HttpHeaders(),
+                                        HttpStatus.FORBIDDEN);
         }
     }
 
     public void addSession(WebSocketSession session){
 
         if(sessions.containsKey(session.getAttributes().get("channelName"))){
-
             sessions.get(session.getAttributes().get("channelName")).add(session);
         }
         else{
             List<WebSocketSession> sessionList = new ArrayList<>();
             sessionList.add(session);
-            sessions.put(
-                    (String)session.getAttributes().get("channelName"),
-                    sessionList);
+            sessions.put((String)session.getAttributes().get("channelName"), sessionList);
         }
     }
 }

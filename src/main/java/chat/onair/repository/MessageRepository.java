@@ -12,14 +12,13 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel = "messages", path = "messages")
 public interface MessageRepository extends JpaRepository<Message, String>{
 
-    @RestResource(path = "findByMessageId")
-    Message findByMessageId(@Param("messageId") String messageId);
+    @RestResource(path = "find-by-message-id")
+    Message findByMessageId(@Param("id") String id);
 
-    @RestResource(path = "findByAccountId")
-    List<Message> findByAccountId(@Param("accountId") String accountId);
+    @RestResource(path = "find-by-account-id")
+    List<Message> findByAccountId(@Param("id") String id);
 
-    @RestResource(path = "listMessages")
-    List<Message> findByParentAndDateOfCreationGreaterThan(
-            @Param("parent")Channel parent,
-            @Param("history") String history);
+    @RestResource(path = "list-messages")
+    List<Message> findByParentAndDateOfCreationGreaterThan( @Param("parent")Channel parent,
+                                                            @Param("history") String history);
 }

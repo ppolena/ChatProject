@@ -1,6 +1,5 @@
 package chat.onair.response;
 
-import chat.onair.response.Response;
 import lombok.Data;
 
 import java.time.Instant;
