@@ -1,6 +1,8 @@
 package chat.onair.entity;
 
 import lombok.Data;
+import org.springframework.data.rest.core.annotation.RestResource;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
@@ -25,7 +27,8 @@ public class Channel {
     private String dateOfCreation = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
     private String dateOfClosing;
-
+    
+    @RestResource(path = "list-of-messages")
     @OneToMany(fetch = FetchType.EAGER, mappedBy="parent", cascade = CascadeType.MERGE)
     private List<Message> listOfMessages;
 
